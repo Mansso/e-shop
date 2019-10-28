@@ -16,7 +16,7 @@
                     <div class="carousel-inner">
                         @foreach($banners as $key => $banner)
                         <div class="item @if($key==0) active @endif">
-                            <img src="{{ asset('images/frontend_images/banners/'.$banner->image) }}" alt="">
+                            <img src="{{ asset('images/frontend_images/banners/'.$banner->image) }}" class="img-responsive" alt="" style="max-height: 330px;margin: auto;">
                         </div>
                         @endforeach
                     </div>
@@ -54,13 +54,13 @@
                                     <img src="{{ asset('images/backend_images/products/small/'.$product->image) }}" class="img-responsive" alt="" style="max-height: 250px;margin: auto;" />
                                     <h2>${{ $product->price }}</h2>
                                     <p>{{ $product->product_name }}</p>
-                                    <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+                                    <a href="{{ asset('product/'.$product->id) }}" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>View product</a>
                                 </div>
                                 <div class="product-overlay">
                                     <div class="overlay-content">
                                         <h2>${{ $product->price }}</h2>
                                         <p>{{ $product->product_name }}</p>
-                                        <a href="#" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</a>
+                                        <a href="{{ asset('product/'.$product->id) }}" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>View product</a>
                                     </div>
                                 </div>
                             </div>

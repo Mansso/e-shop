@@ -11,10 +11,10 @@
             </ol>
         </div>
         @if(Session::has('flash_message_error'))
-            <div class="alert alert-danger alert-block">
-                <button type="button" class="close" data-dismiss="alert">x</button>
-                <strong>{!! session('flash_message_error') !!}</strong>
-            </div>
+        <div class="alert alert-danger alert-block">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            <strong>{!! session('flash_message_error') !!}</strong>
+        </div>
         @endif
         <form action="{{ url('/checkout') }}" method="post">{{ csrf_field() }}
             <div class="row">
@@ -38,7 +38,7 @@
                             <select id="billing_country" name="billing_country" class="form-control">
                                 <option value="">Select Country</option>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->country_name }}" @if($country->country_name == $userDetails->Country) selected @endif>{{ $country->country_name }}</option>
+                                <option value="{{ $country->country_name }}" @if($country->country_name == $userDetails->Country) selected @endif>{{ $country->country_name }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -65,30 +65,30 @@
                         <!--sign up form-->
                         <h2>Ship to</h2>
                         <div class="form-group">
-                            <input name="shipping_name" id="shipping_name" value="{{ $shippingDetails->name }}" type="text" placeholder="Name" class="form-control" />
+                            <input name="shipping_name" id="shipping_name"  type="text" placeholder="Name" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <input name="shipping_adress" id="shipping_adress" value="{{ $shippingDetails->adress }}" type="text" placeholder="Adress" class="form-control" />
+                            <input name="shipping_adress" id="shipping_adress"  type="text" placeholder="Adress" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <input name="shipping_city" id="shipping_city" value="{{ $shippingDetails->city }}" type="text" placeholder="City" class="form-control" />
+                            <input name="shipping_city" id="shipping_city"  type="text" placeholder="City" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <input name="shipping_state" id="shipping_state" value="{{ $shippingDetails->state }}" type="text" placeholder="State" class="form-control" />
+                            <input name="shipping_state" id="shipping_state" type="text" placeholder="State" class="form-control" />
                         </div>
                         <div class="form-group">
                             <select id="shipping_country" name="shipping_country" class="form-control">
                                 <option value="">Select Country</option>
                                 @foreach($countries as $country)
-                                    <option value="{{ $country->country_name }}"@if($country->country_name == $userDetails->Country) selected @endif>{{ $country->country_name }}</option>
+                                <option value="{{ $country->country_name }}" @if($country->country_name == $userDetails->Country) selected @endif>{{ $country->country_name }}</option>
                                 @endforeach
                             </select>
                         </div>
                         <div class="form-group">
-                            <input name="shipping_pincode" id="shipping_pincode" value="{{ $shippingDetails->pincode }}" type="text" placeholder="Pincode" class="form-control" />
+                            <input name="shipping_pincode" id="shipping_pincode"  type="text" placeholder="Pincode" class="form-control" />
                         </div>
                         <div class="form-group">
-                            <input name="shipping_mobile" id="shipping_mobile" value="{{ $shippingDetails->mobile }}" type="text" placeholder="Mobile" class="form-control" />
+                            <input name="shipping_mobile" id="shipping_mobile"  type="text" placeholder="Mobile" class="form-control" />
                         </div>
                         <button type="submit" class="btn btn-success">Checkout</button>
                     </div>

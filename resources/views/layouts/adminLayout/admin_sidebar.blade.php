@@ -22,6 +22,11 @@
                 <li><a href="{{ url('/admin/view-banners') }}">View Banners</a></li>
             </ul>
         </li>
+        <li class="submenu"> <a href="#"><i class="icon icon-th-list"></i> <span>Orders</span> <span class="label label-important">1</span></a>
+            <ul>
+                <li><a href="{{ url('/admin/view-orders') }}">View Orders</a></li>
+            </ul>
+        </li>
     </ul>
 </div>
 <!--sidebar-menu-->

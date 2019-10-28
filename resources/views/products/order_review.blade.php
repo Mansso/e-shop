@@ -85,30 +85,30 @@
                 <tbody>
                     <?php $total_amount = 0; ?>
                     @foreach($userCart as $cart)
-                        <tr>
-                            <td class="cart_product">
-                                <a href=""><img style="width:150px" src={{ asset('images/backend_images/products/small/'.$cart->image) }} alt=""></a>
-                            </td>
-                            <td class="cart_description">
-                                <h4><a href="">{{ $cart->product_name }}</a></h4>
-                                <p>Code : {{ $cart->product_code }}</p>
-                            </td>
-                            <td class="cart_price">
-                                <p>$ {{ $cart->price }}</p>
-                            </td>
-                            <td class="cart_quantity">
-                                <div class="cart_quantity_button">
-                                    {{ $cart->quantity }}
-                                </div>
-                            </td>
-                            <td class="cart_total">
-                                <p class="cart_total_price">$ {{ $cart->price*$cart->quantity }}</p>
-                            </td>
-                        </tr>
-                        <?php $total_amount = $total_amount + ($cart->price * $cart->quantity); ?>
+                    <tr>
+                        <td class="cart_product">
+                            <a href=""><img style="width:150px" src={{ asset('images/backend_images/products/small/'.$cart->image) }} alt=""></a>
+                        </td>
+                        <td class="cart_description">
+                            <h4><a href="">{{ $cart->product_name }}</a></h4>
+                            <p>Code : {{ $cart->product_code }}</p>
+                        </td>
+                        <td class="cart_price">
+                            <p>$ {{ $cart->price }}</p>
+                        </td>
+                        <td class="cart_quantity">
+                            <div class="cart_quantity_button">
+                                {{ $cart->quantity }}
+                            </div>
+                        </td>
+                        <td class="cart_total">
+                            <p class="cart_total_price">$ {{ $cart->price*$cart->quantity }}</p>
+                        </td>
+                    </tr>
+                    <?php $total_amount = $total_amount + ($cart->price * $cart->quantity); ?>
                     @endforeach
 
-                   
+
                     <tr>
                         <td colspan="4">&nbsp;</td>
                         <td colspan="2">
@@ -123,7 +123,11 @@
                 </tbody>
             </table>
         </div>
-        <div class="payment-options">
+        <form name="paymentForm" id="paymentForm" action="{{ url('/place-order') }}" method="post">{{ csrf_field() }}
+            <input type="hidden" name="total_amount" value="{{ $total_amount }}">
+            <span style="float:right"><button class="btn btn-success" type="submit">Order</button></span>
+        </form>
+        <!-- <div class="payment-options">
             <span>
                 <label><input type="checkbox"> Direct Bank Transfer</label>
             </span>
@@ -133,7 +137,7 @@
             <span>
                 <label><input type="checkbox"> Paypal</label>
             </span>
-        </div>
+        </div> -->
     </div>
 </section>
 <!--/#cart_items-->

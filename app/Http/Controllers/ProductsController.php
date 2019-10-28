@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Input;
+use Illuminate\Support\Facades\Mail;
 use Auth;
 use Session;
 use Image;
@@ -15,6 +16,8 @@ use App\User;
 use App\Country;
 use App\DeliveryAdresses;
 use DB;
+use App\Order;
+use App\OrdersProduct;
 
 
 
@@ -402,8 +405,13 @@ class ProductsController extends Controller
     }
 
     public function cart(){
-        $session_id = Session::get('session_id');
-        $userCart = DB::table('cart')->where(['session_id'=>$session_id])->get();
+        if(Auth::check()){
+            $user_email = Auth::User()->email;
+            $userCart = DB::table('cart')->where(['user_email' => $user_email])->get();
+        }else{
+            $session_id = Session::get('session_id');
+            $userCart = DB::table('cart')->where(['session_id' => $session_id])->get();
+        }
         foreach($userCart as $key => $product){
             $productDetails = Product::where('id', $product->product_id)->first();
             $userCart[$key]->image = $productDetails->image;
@@ -436,12 +444,25 @@ class ProductsController extends Controller
         $user_email = Auth::User()->email;
         $userDetails = User::find($user_id);
         $countries = Country::get();
+        $shippingDetails = DeliveryAdresses::where('user_id', $user_id)->first();
+        $shippingCount = DeliveryAdresses::where('user_id', $user_id)->count();
 
         //Checking if shipping adress exist
-        $shippingCount = DeliveryAdresses::where('user_id', $user_id)->count();
-        if($shippingCount > 0){
-            $shippingDetails = DeliveryAdresses::where('user_id', $user_id)->first();
+
+        if ((DeliveryAdresses::where('user_id', $user_id)->count())>0){
+
+            $shippingCount = DeliveryAdresses::where('user_id', $user_id)->count();
+            if ($shippingCount > 0) {
+                $shippingDetails = DeliveryAdresses::where('user_id', $user_id)->first();
+            }
         }
+        elseif($request->isMethod('get')){
+            return view('products.checkout',compact('userDetails','countries', 'shippingDetails'));
+            }
+
+
+        
+
 
         //update cart tabel with user email
         $session_id = Session::get('session_id');
@@ -479,9 +500,10 @@ class ProductsController extends Controller
             return redirect()->action('ProductsController@orderReview');
 
         }
+        // return $userDetails->name;
 
-
-        return view('products.checkout')->with(compact('userDetails', 'countries', 'shippingDetails'));
+        // return view('products.checkout')->with(compact('userDetails', 'countries', 'shippingDetails'));
+        return view('products.checkout',compact('userDetails', 'countries', 'shippingDetails'));
     }
 
     public function orderReview(){
@@ -498,5 +520,82 @@ class ProductsController extends Controller
         }
         // dd($userCart);
         return view('products.order_review')->with(compact('shippingDetails', 'userDetails', 'userCart'));
+    }
+
+    public function placeOrder (Request $request){
+        if($request->isMethod('post')){
+            $data = $request->all();
+            $user_id = Auth::user()->id;
+            $user_email = Auth::user()->email;
+            //Getting shipping adress
+            $shippingDetails = DeliveryAdresses::where(['user_email'=>$user_email])->first();
+            
+            $order = new Order;
+            $order->user_id = $user_id;
+            $order->user_email = $user_email;
+            $order->name = $shippingDetails->name;
+            $order->adress = $shippingDetails->adress;
+            $order->city = $shippingDetails->city;
+            $order->state = $shippingDetails->state;
+            $order->pincode = $shippingDetails->pincode;
+            $order->country = $shippingDetails->country;
+            $order->mobile = $shippingDetails->mobile;
+            // $order->payment_method = $data['payment_method'];
+            $order->total_amount = $data['total_amount'];
+            $order->save();
+
+            $order_id = DB::getPdo()->lastInsertId();
+            $cartProducts = DB::table('cart')->where(['user_email'=>$user_email])->get();
+            foreach($cartProducts as $pro){
+                $cartPro = new OrdersProduct();
+                $cartPro->order_id = $order_id;
+                $cartPro->user_id = $user_id;
+                $cartPro->product_id = $pro->product_id;
+                $cartPro->product_code = $pro->product_code;
+                $cartPro->product_name = $pro->product_name;
+                $cartPro->product_size = $pro->size;
+                $cartPro->product_price = $pro->price;
+                $cartPro->product_qty = $pro->quantity;
+                $cartPro->save();
+            }
+
+            Session::put('order_id', $order_id);
+            Session::put('total_amount', $data['total_amount']);
+
+            return redirect('/thanks');
+        }
+    }
+
+    public function thanks (Request $request){
+        $user_email = Auth::user()->email;
+        DB::table('cart')->where('user_email', $user_email)->delete();
+        return view('products.thanks');
+    }
+
+    public function userOrders(Request $request){
+        $user_id = Auth::user()->id;
+        $orders = Order::with('orders')->where('user_id', $user_id)->orderBy('created_at','DESC')->get();
+        return view('products.user_orders')->with(compact('orders'));
+    }
+
+    public function userOrderDetails($order_id){
+        $user_id = Auth::user()->id;
+        $orderDetails = Order::with('orders')->where('id', $order_id)->first();
+        
+        $orderDetails = json_decode(json_encode($orderDetails));
+        return view('products.user_order_details')->with(compact('orderDetails'));
+    }
+
+    public function ViewOrders(){
+        $orders = Order::with('orders')->orderBy('id', 'DESC')->get();
+        $orders = json_decode(json_encode($orders));
+        // dd($orders);
+        return view('admin.orders.view_orders')->with(compact('orders'));
+    }
+
+    public function ViewOrderDetails($order_id){
+        $orderDetails = Order::with('order')->where('id', $order_id)->first();
+        $orderDetails = json_decode(json_encode($orderDetails));
+        return view('admin.orders.order_details')->with(compact('$orderDetails'));
     }
 }

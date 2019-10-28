@@ -74,6 +74,18 @@ Route::group(['middleware' => ['frontlogin']], function(){
 
     //Order review page
     Route::match(['get', 'post'], '/order-review', 'ProductsController@orderReview');
+
+    //place Order
+    Route::match(['get', 'post'], '/place-order', 'ProductsController@placeOrder');
+
+    //Thanks page
+    Route::get('/thanks', 'ProductsController@thanks');
+
+    //User order page
+    Route::get('/orders', 'ProductsController@userOrders');
+
+    //User order page
+    Route::get('/orders/{id}', 'ProductsController@userOrderDetails');
 });
 
 //Check if user already exists
@@ -110,6 +122,12 @@ Route::group(['middleware' => ['auth']],function(){
     Route::match(['get','post'],'/admin/edit-banner/{id}','BannersController@editBanner');
     Route::get('admin/view-banners', 'BannersController@viewBanners');
     Route::get('admin/delete-banner/{id}', 'BannersController@deleteBanner');
+
+    //Add orders routes
+    Route::get('/admin/view-orders', 'ProductsController@ViewOrders');
+
+    //Add orders Details routes
+    Route::get('/admin/view-order/{id}', 'ProductsController@ViewOrderDetails');
 });
 
 

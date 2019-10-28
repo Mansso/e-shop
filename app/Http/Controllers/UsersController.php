@@ -8,6 +8,7 @@ use App\Country;
 use Auth;
 use Session;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UsersController extends Controller
 {

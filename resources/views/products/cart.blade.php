@@ -76,10 +76,10 @@
 <section id="do_action">
     <div class="container">
         <div class="heading">
-            <h3>What would you like to do next?</h3>
-            <p>Choose if you have a discount code or reward points you want to use or would like to estimate your delivery cost.</p>
+            <h3>Proceed to checkout</h3>
+            <!-- <p>Choose if you have a discount code or reward points you want to use or would like to estimate your delivery cost.</p> -->
         </div>
-        <div class="row">
+        <!-- <div class="row">
             <div class="col-sm-6">
                 <div class="chose_area">
                     <ul class="user_option">
@@ -133,7 +133,7 @@
                     <a class="btn btn-default update" href="">Get Quotes</a>
                     <a class="btn btn-default check_out" href="">Continue</a>
                 </div>
-            </div>
+            </div> -->
             <div class="col-sm-6">
                 <div class="total_area">
                     <ul>

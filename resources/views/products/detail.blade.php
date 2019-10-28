@@ -53,7 +53,7 @@
                             <input type="hidden" name="product_id" value="{{ $productDetails->id }}">
                             <div class="product-information">
                                 <!--/product-information-->
-                                <img src="images/product-details/new.jpg" class="newarrival" alt="" />
+                                <!-- <img src="images/product-details/new.jpg" class="newarrival" alt="" /> -->
                                 <h2>{{ $productDetails->product_name }}</h2>
                                 <p>Code: {{ $productDetails->product_code }}</p>
                                 <p>
@@ -64,7 +64,7 @@
                                         @endforeach
                                     </select>
                                 </p>
-                                <img src="images/product-details/rating.png" alt="" />
+                                <!-- <img src="images/product-details/rating.png" alt="" /> -->
                                 <span>
                                     <span id="getPrice">US ${{ $productDetails->price }}</span>
                                     <label>Quantity:</label>
@@ -78,7 +78,7 @@
                                 </span>
                                 <p><b>Availability:</b> <span id="availability"> @if($total_stock>0) In Stock @else Out of Stock @endif</p></span>
                                 <p><b>Condition:</b> New</p>
-                                <a href=""><img src="images/product-details/share.png" class="share img-responsive" alt="" /></a>
+                                <!-- <a href=""><img src="images/product-details/share.png" class="share img-responsive" alt="" /></a> -->
                             </div>
                         </form>
                         <!--/product-information-->
@@ -142,7 +142,7 @@
                                                         <h2>$ {{ $item->price }}</h2>
                                                         <p>{{ $item->product_name }}</p>
                                                         <a href="{{ url('product/'.$item->id) }}">
-                                                            <button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>Add to cart</button>
+                                                            <button type="button" class="btn btn-default add-to-cart"><i class="fa fa-shopping-cart"></i>View product</button>
                                                         </a>
                                                     </div>
                                                 </div>
