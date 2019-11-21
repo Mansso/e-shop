@@ -88,6 +88,9 @@ Route::group(['middleware' => ['frontlogin']], function(){
     Route::get('/orders/{id}', 'ProductsController@userOrderDetails');
 });
 
+//Apply Coupon
+Route::post('/cart/apply-coupon','ProductsController@applyCoupon');
+
 //Check if user already exists
 Route::match(['get', 'post'], '/check-email', 'UsersController@checkEmail');
 
@@ -116,6 +119,12 @@ Route::group(['middleware' => ['auth']],function(){
     Route::match(['get','post'],'/admin/edit-attributes/{id}','ProductsController@editAttributes');
     Route::match(['get', 'post'], '/admin/add-images/{id}', 'ProductsController@addImages');
     Route::get('/admin/delete-attribute/{id}','ProductsController@deleteAttribute');
+
+    //Coupons Route
+    Route::match(['get','post'],'admin/add-coupon','CouponsController@addCoupon');
+    Route::match(['get','post'], '/admin/edit-coupon/{id}','CouponsController@editCoupon');
+    Route::get('/admin/view-coupons','CouponsController@viewCoupon');
+    Route::get('/admin/delete-coupon/{id}', 'CouponsController@deleteCoupon');
 
     //Admin Banners Routes
     Route::match(['get','post'], '/admin/add-banner', 'BannersController@addBanner');

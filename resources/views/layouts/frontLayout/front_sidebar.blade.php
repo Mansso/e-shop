@@ -17,9 +17,11 @@
             </div>
             <div id="{{ $cat->id }}" class="panel-collapse collapse" style="height: 0px;">
                 <div class="panel-body">
-                    <ul>
+                    <ul style="padding-left:40px;margin:-20px 0 -15px;">
                         @foreach($cat->categories as $subcat)
-                        <li><a href="{{ asset('/products/'.$subcat->name) }}">{{ $subcat->name }}</a></li>
+                        @if($subcat->status==1)
+                        <li><a href="{{ asset('/products/'.$subcat->url) }}">{{ $subcat->name }}</a></li>
+                        @endif
                         @endforeach
                     </ul>
                 </div>

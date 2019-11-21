@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\Controller;
-
 $mainCategories = Controller::mainCategories();
+
 ?>
 <header id="header">
     <!--header-->
@@ -106,7 +106,7 @@ $mainCategories = Controller::mainCategories();
                                 <ul role="menu" class="sub-menu">
                                     @foreach($mainCategories as $cat)
                                         @if($cat->status=="1")
-                                            <li><a href="{{ asset('products/'.$cat->name) }}">{{ $cat->name }}</a></li>
+                                            <li><a href="{{ asset('products/'.$cat->url) }}">{{ $cat->name }}</a></li>
                                         @endif
                                     @endforeach
                                 </ul>

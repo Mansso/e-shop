@@ -12,12 +12,14 @@ use App\Category;
 use App\Product;
 use App\ProductsAttribute;
 use App\ProductsImage;
+use App\Coupon;
 use App\User;
 use App\Country;
 use App\DeliveryAdresses;
 use DB;
 use App\Order;
 use App\OrdersProduct;
+
 
 
 
@@ -120,9 +122,9 @@ class ProductsController extends Controller
                 $data['care'] = '';
             }
 
-            if (empty($data['status'])) {
+            if(empty($data['status'])){
                 $status = 0;
-            } else {
+            }else{
                 $status = 1;
             }
 
@@ -298,42 +300,29 @@ class ProductsController extends Controller
         return redirect()->back()->with('flash_message_success','Atrribute has been deleted successfully');
     }
 
-    public function products($url = null){
-
-        // Show 404 page ij category doesn't exist
+    public function products($url=null){
+        // Show 404 page if category doesn't exist
         $countCategory = Category::where(['url'=> $url,'status'=>1])->count();
         if($countCategory==0){
             abort(404);
         }
 
-        $categoryDetails = Category::where(['name' => $url])->first();
         $categories = Category::with('categories')->where(['parent_id' => 0])->get();
-        
+
+        $categoryDetails = Category::where(['url'=>$url])->first();  
+        // dd($categoryDetails->id);  
         if($categoryDetails->parent_id==0){
-            //if name is main category
+            //if url is main category url
             $subCategories = Category::where(['parent_id'=> $categoryDetails->id])->get();
 
             foreach($subCategories as $subcat){
                 $cat_ids[] = $subcat->id;
             }
-            $productsAll = Product::whereIn('category_id', $cat_ids)->where('status',1)->get();
+            $productsAll = Product::whereIn('category_id', $cat_ids)->where('status','1')->get();
             $productsAll = json_decode(json_encode($productsAll));
-
-
-            /*$cat_ids = $categoryDetails->id . ",";
-            foreach($subCategories as $key =>$subcat){
-                if($key==1) $cat_ids.= ",";
-                $cat_ids .= $subcat->id;
-            }
-            //echo $cat_ids; die;
-            $cat_ids = explode(",", $cat_ids);
-            $productsAll = Product::whereIn('category_id', $cat_ids)->get();
-            // dd($productsAll);
-            //$productsAll = json_decode(json_encode($productsAll));
-            //echo "<pre>"; print_r($productsAll); die;*/
         }else{
             //if name is sub category 
-            $productsAll = Product::where(['category_id' => $categoryDetails->id])->where('status', 1)->get();
+            $productsAll = Product::where(['category_id' => $categoryDetails->id])->where('status', '1')->get();
         }
         
         return view('products.listing')->with(compact('categories', 'categoryDetails','productsAll'));
@@ -384,7 +373,7 @@ class ProductsController extends Controller
         }
         
         $session_id = Session::get('session_id');
-        if(empty($session_id)){
+        if(!isset($session_id)){
             $session_id = str_random(40);
             Session::put('session_id', $session_id);
         }
@@ -423,6 +412,50 @@ class ProductsController extends Controller
     public function deleteCartProduct($id = null){
         DB::table('cart')->where('id', $id)->delete();
         return redirect('cart')->with('flash_message_success','Product removed from Cart');
+    }
+
+    public function applyCoupon(Request $request){
+
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
+
+        $data = $request->all();
+        // dd($data);
+        $couponCount = Coupon::where('coupon_code',$data['coupon_code'])->count();
+        if($couponCount == 0){
+            return redirect()->back()->with('flash_message_error','This coupon is invalid !');
+        }else{
+            $couponDetails = Coupon::where('coupon_code',$data['coupon_code'])->first();
+            //if coupon is inactive
+            if($couponDetails->status==0){
+                return redirect()->back()->with('flash_message_error','This coupon is not active !');
+            }
+            //if coupon code is expired
+            $expiry_date = $couponDetails->expiry_date;
+            $current_date = date('Y-m-d');
+            if($expiry_date < $current_date){
+                return redirect()>back()->with('flash_message_error','This coupon is expired !');
+            }
+
+            $session_id = Session::get('session_id');
+            $userCart = DB::table('cart')->where(['session_id' => $session_id])->get();
+            $total_amount = 0;
+            foreach($userCart as $item){
+                $total_amount = $total_amount + ($item->price * $item->quantity);
+            }
+
+            //Coupon is valid
+            if($couponDetails->amount_type=="Fixed"){
+                $couponAmount = $couponDetails->amount;
+            }else{
+                $couponAmount = $total_amount * ($couponDetails->amount/100);
+            }
+            //Add coupon code & amount in session
+            Session::put('CouponAmount',$couponAmount);
+            Session::put('CouponCode',$data['coupon_code']);
+
+            return redirect()->back()->with('flash_message_success','Coupon applied successfully !');
+        }
     }
 
     public function updateCartQuantity($id=null, $quantity=null){

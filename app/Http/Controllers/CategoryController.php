@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
+use Session;
 use App\Category;
 
 class CategoryController extends Controller
@@ -35,13 +37,13 @@ class CategoryController extends Controller
         if($request->isMethod('post')){
             $data = $request->all();
 
-            if (empty($data['status'])) {
+            if(empty($data['status'])){
                 $status = 0;
-            } else {
+            }else{
                 $status = 1;
             }
 
-            Category::where(['id'=>$id])->update(['name'=>$data['category_name'],'description'=>$data['description'],'url'=>$data['url'],'status'=>$status]);
+            Category::where(['id'=>$id])->update(['name'=>$data['category_name'],'parent_id'=>$data['parent_id'],'description'=>$data['description'],'url'=>$data['url'],'status'=>$status]);
             return redirect('/admin/view-category')->with('flash_message_success','Category updated Successfully!');
         }
         $categoryDetails = Category::where(['id'=>$id])->first();
@@ -58,7 +60,7 @@ class CategoryController extends Controller
 
     public function viewCategories(){
         $categories = Category::get();
-        $categories = json_decode(json_encode($categories));
+        // $categories = json_decode(json_encode($categories));
         return view('admin.categories.view_categories')->with(compact('categories'));
     }
 }

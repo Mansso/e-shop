@@ -226,13 +226,13 @@ $(document).ready(function(){
 		return false;
 	});*/
 
-	/*$("a[id^='delProduct']").click(function () {
-		//echo('test');
-		if (confirm('Delete this Product?')) {
-			return true;
-		}
-		return false;
-	});*/
+	// $("a[id^='delCoupon']").click(function () {
+	// 	//echo('test');
+	// 	if (confirm('Delete this Coupon?')) {
+	// 		return true;
+	// 	}
+	// 	return false;
+	// });
 
 	$(".deleteRecord").click(function(){
 		var id = $(this).attr('rel');
@@ -256,7 +256,7 @@ $(document).ready(function(){
 		var maxField = 10; //Input fields increment limitation
 		var addButton = $('.add_button'); //Add button selector
 		var wrapper = $('.field_wrapper'); //Input field wrapper
-		var fieldHTML = '<div class="field_wrapper" style="margin-left:180px"><div><input type="text" name="field_name[]" id="sku" placeholder="SKU" style="width:120px; margin-right:3px; margin-top:3px;"/><input type="text" name="size[]" id="size" placeholder="size" style="width:120px; margin-right:3px; margin-top:3px;" /><input type="text" name="price[]" id="price" placeholder="price" style="width:120px; margin-right:3px; margin-top:3px;" /><input type="text" name="stock[]" id="stock" placeholder="stock" style="width:120px; margin-right:3px; margin-top:3px;" /><a href="javascript:void(0);" class="remove_button">Remove</a></div></div>'; //New input field html 
+		var fieldHTML = '<div class="field_wrapper" style="margin-left:180px"><input type="text" name="sku[]" id="sku" placeholder="SKU" style="width:120px; margin-right:3px; margin-top:3px;"/><input type="text" name="size[]" id="size" placeholder="Size" style="width:120px; margin-right:3px; margin-top:3px;" /><input type="text" name="price[]" id="price" placeholder="Price" style="width:120px; margin-right:3px; margin-top:3px;" /><input type="text" name="stock[]" id="stock" placeholder="Stock" style="width:120px; margin-right:3px; margin-top:3px;" /><a href="javascript:void(0);" class="remove_button">Remove</a></div>'; //New input field html 
 		var x = 1; //Initial field counter is 1
 		
 		//Once add button is clicked
