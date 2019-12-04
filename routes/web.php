@@ -18,9 +18,9 @@ use App\Http\Controllers\AdminController;
 
 Route::match(['get', 'post'], '/admin', 'AdminController@login');
 
-Auth::routes();
+Auth::routes(['verify'=>true]);
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'HomeController@index')->name('home')->middleware('verified');
 
 //index page
 Route::get('/', 'IndexController@index');

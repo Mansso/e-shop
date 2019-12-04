@@ -365,28 +365,28 @@ class ProductsController extends Controller
     }
 
     public function addtocart(Request $request){
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
         $data = $request->all();
         // echo "<pre>"; print_r($data); die;
-
-        if(empty($data['user_email'])){
+        if(empty(Auth::user()->email)){
             $data['user_email'] = '';
+        }else{
+            $data['user_email'] = Auth::user()->email;
         }
-        
+
+
         $session_id = Session::get('session_id');
         if(!isset($session_id)){
             $session_id = str_random(40);
             Session::put('session_id', $session_id);
         }
-        
         $sizeArr = explode("-", $data['size']);
-
         $countProducts = DB::table('cart')->where(['product_id'=>$data['product_id'], 'size'=>$sizeArr[1] , 'session_id'=>$session_id])->count();
-
         if($countProducts > 0){
             return redirect()->back()->with('flash_message_error','Product already exists in Cart');
         }else{
             $getSKU = ProductsAttribute::select('sku')->where(['product_id'=> $data['product_id'], 'size' => $sizeArr[1]])->first();
-
             DB::table('cart')->insert(['product_id' => $data['product_id'], 'product_name' => $data['product_name'], 'product_code' => $getSKU->sku, 'price' => $data['price'], 'size' => $sizeArr[1], 'quantity' => $data['quantity'], 'user_email' => $data['user_email'], 'session_id' => $session_id]);
         }
         
@@ -394,22 +394,25 @@ class ProductsController extends Controller
     }
 
     public function cart(){
-        if(Auth::check()){
-            $user_email = Auth::User()->email;
+        if (Auth::check()) {
+            $user_email = Auth::user()->email;
             $userCart = DB::table('cart')->where(['user_email' => $user_email])->get();
-        }else{
+        } else {
             $session_id = Session::get('session_id');
             $userCart = DB::table('cart')->where(['session_id' => $session_id])->get();
         }
-        foreach($userCart as $key => $product){
+
+        foreach ($userCart as $key => $product) {
             $productDetails = Product::where('id', $product->product_id)->first();
             $userCart[$key]->image = $productDetails->image;
         }
-        // echo "<pre>";print_r($userCart);
+        /*echo "<pre>"; print_r($userCart); die;*/
         return view('products.cart')->with(compact('userCart'));
     }
 
     public function deleteCartProduct($id = null){
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
         DB::table('cart')->where('id', $id)->delete();
         return redirect('cart')->with('flash_message_success','Product removed from Cart');
     }
@@ -438,7 +441,15 @@ class ProductsController extends Controller
             }
 
             $session_id = Session::get('session_id');
-            $userCart = DB::table('cart')->where(['session_id' => $session_id])->get();
+
+            if (Auth::check()) {
+                $user_email = Auth::user()->email;
+                $userCart = DB::table('cart')->where(['user_email' => $user_email])->get();
+            } else {
+                $session_id = Session::get('session_id');
+                $userCart = DB::table('cart')->where(['session_id' => $session_id])->get();
+            }
+
             $total_amount = 0;
             foreach($userCart as $item){
                 $total_amount = $total_amount + ($item->price * $item->quantity);
@@ -459,6 +470,8 @@ class ProductsController extends Controller
     }
 
     public function updateCartQuantity($id=null, $quantity=null){
+        Session::forget('CouponAmount');
+        Session::forget('CouponCode');
         $getCartDetails = DB::table('cart')->where('id',$id)->first();
         $getAttributeStock = ProductsAttribute::where('sku', $getCartDetails->product_code)->first();
         $updated_quantity = $getCartDetails->quantity+$quantity;
@@ -468,8 +481,6 @@ class ProductsController extends Controller
         }else{
             return redirect('cart')->with('flash_message_error', 'Maximum stock reached !');
         }
-
-        
     }
 
     public function checkout(Request $request){
@@ -477,33 +488,23 @@ class ProductsController extends Controller
         $user_email = Auth::User()->email;
         $userDetails = User::find($user_id);
         $countries = Country::get();
-        $shippingDetails = DeliveryAdresses::where('user_id', $user_id)->first();
+
+        //Checking if shipping adress exists
         $shippingCount = DeliveryAdresses::where('user_id', $user_id)->count();
-
-        //Checking if shipping adress exist
-
-        if ((DeliveryAdresses::where('user_id', $user_id)->count())>0){
-
-            $shippingCount = DeliveryAdresses::where('user_id', $user_id)->count();
-            if ($shippingCount > 0) {
-                $shippingDetails = DeliveryAdresses::where('user_id', $user_id)->first();
-            }
+        if ($shippingCount > 0) {
+            $shippingDetails = DeliveryAdresses::where('user_id', $user_id)->first();
         }
-        elseif($request->isMethod('get')){
-            return view('products.checkout',compact('userDetails','countries', 'shippingDetails'));
-            }
 
-
-        
-
-
-        //update cart tabel with user email
+        //update cart table with user email
         $session_id = Session::get('session_id');
-        DB::table('cart')->where(['session_id'=>$session_id])->update(['user_email'=>$user_email]);
-        //Return to checkout page if any field is empty
+        DB::table('cart')->where(['session_id' => $session_id])->update(['user_email' => $user_email]);
+        
+        
+        
         if($request->isMethod('post')){
             $data = $request->all();
             // dd($data);
+            //Return to checkout page if any field is empty
             if(empty($data['billing_name']) || empty($data['billing_adress']) || empty($data['billing_city']) ||empty($data['billing_state']) ||empty($data['billing_country']) ||empty($data['billing_pincode']) ||empty($data['billing_mobile']) ||empty($data['shipping_name']) ||empty($data['shipping_adress']) ||empty($data['shipping_city']) ||empty($data['shipping_state']) ||empty($data['shipping_country']) ||empty($data['shipping_pincode']) ||empty($data['shipping_mobile'])){
                 return redirect()->back()->with('flash_message_error', 'All fields are required !');
             }
@@ -517,7 +518,7 @@ class ProductsController extends Controller
                 DeliveryAdresses::where('user_id', $user_id)->update(['name' => $data['shipping_name'], 'Adress' => $data['shipping_adress'], 'City' => $data['shipping_city'], 'State' => $data['shipping_state'], 'Country' => $data['shipping_country'], 'Pincode' => $data['shipping_pincode'], 'mobile' => $data['shipping_mobile']]);
             }else{
                 //Add new shipping adress
-                $shipping = new DeliveryAdresses();
+                $shipping = new DeliveryAdresses;
                 $shipping->user_id = $user_id;
                 $shipping->user_email = $user_email;
                 $shipping_name = $data['shipping_name'];
@@ -562,8 +563,20 @@ class ProductsController extends Controller
             $user_email = Auth::user()->email;
             //Getting shipping adress
             $shippingDetails = DeliveryAdresses::where(['user_email'=>$user_email])->first();
+
+            if(empty(Session::get('CouponCode'))){
+                $coupon_code = '';
+            }else{
+                $coupon_code = Session::get('CouponCode');
+            }
+
+            if(empty(Session::get('couponAmount'))){
+                $coupon_amount = '';
+            }else{
+                $coupon_amount = Session::get('couponAmount');
+            }
             
-            $order = new Order;
+            $order = new Order();
             $order->user_id = $user_id;
             $order->user_email = $user_email;
             $order->name = $shippingDetails->name;
@@ -573,8 +586,10 @@ class ProductsController extends Controller
             $order->pincode = $shippingDetails->pincode;
             $order->country = $shippingDetails->country;
             $order->mobile = $shippingDetails->mobile;
-            // $order->payment_method = $data['payment_method'];
-            $order->total_amount = $data['total_amount'];
+            $order->coupon_code = $coupon_code;
+            $order->coupon_amount = $coupon_amount;
+            $order->payment_method = $data['payment_method'];
+            $order->grand_total = $data['grand_total'];
             $order->save();
 
             $order_id = DB::getPdo()->lastInsertId();
@@ -593,7 +608,7 @@ class ProductsController extends Controller
             }
 
             Session::put('order_id', $order_id);
-            Session::put('total_amount', $data['total_amount']);
+            Session::put('grand_total', $data['grand_total']);
 
             return redirect('/thanks');
         }

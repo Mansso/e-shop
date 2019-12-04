@@ -70,11 +70,11 @@ $mainCategories = Controller::mainCategories();
                     <div class="shop-menu pull-right">
                         <ul class="nav navbar-nav">
                             <!-- <li><a href="#"><i class="fa fa-star"></i> Wishlist</a></li> -->
-                            <li><a href="{{ url('/orders') }}"><i class="fa fa-crosshairs"></i> Orders</a></li>
                             <li><a href="{{ url('/cart') }}"><i class="fa fa-shopping-cart"></i> Cart</a></li>
                             @if(empty(Auth::check()))
                                 <li><a href="{{ url('/login-register') }}"><i class="fa fa-lock"></i> Login</a></li>
                             @else
+                                <li><a href="{{ url('/orders') }}"><i class="fa fa-crosshairs"></i> Orders</a></li>
                                 <li><a href="{{ url('/account') }}"><i class="fa fa-user"></i> Account</a></li>
                                 <li><a href="{{ url('/user-logout') }}"><i class="fa fa-sign-out"></i> Log out</a></li>
                             @endif

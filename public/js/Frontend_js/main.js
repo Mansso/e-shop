@@ -302,3 +302,12 @@ $().ready(function(){
 	// 	alert("test");
 	// });
 });
+
+function selectPaymentMethod(){
+	if($('#Paypal').is(':checked') || $('#COD').is(':checked')){
+		alert("checked");
+	}else{
+		alert("Please select a payment method first");
+		return false;
+	}
+}

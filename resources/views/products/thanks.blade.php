@@ -17,7 +17,7 @@
     <div class="container">
         <div class="heading" align="center">
             <h3>Your order has been placed successfully !</h3>
-            <p>Order number: {{ Session::get('order_id') }} and total payable about: ${{ Session::get('total_amount') }}</p>
+            <p>Order number: {{ Session::get('order_id') }} and total payable about: ${{ Session::get('grand_total') }}</p>
         </div>
     </div>
 </section>
@@ -26,6 +26,6 @@
 @endsection
 
 <?php
-Session::forget('total_amount');
+Session::forget('grand_total');
 Session::forget('order_id');
 ?>

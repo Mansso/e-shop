@@ -9,7 +9,7 @@
                 <div id="slider-carousel" class="carousel slide" data-ride="carousel">
                     <ol class="carousel-indicators">
                         @foreach($banners as $key => $banner)
-                        <li data-target="#slider-carousel" data-slide-to="0" @if($key=0) class="active" @endif></li>
+                        <li data-target="#slider-carousel" data-slide-to="0" @if($key==0) class="active" @endif></li>
                         @endforeach
                     </ol>
 

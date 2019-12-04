@@ -87,7 +87,7 @@
                     @foreach($userCart as $cart)
                     <tr>
                         <td class="cart_product">
-                            <a href=""><img style="width:150px" src={{ asset('images/backend_images/products/small/'.$cart->image) }} alt=""></a>
+                            <a href=""><img style="width:150px" src="{{ asset('images/backend_images/products/small/'.$cart->image) }}" alt=""></a>
                         </td>
                         <td class="cart_description">
                             <h4><a href="">{{ $cart->product_name }}</a></h4>
@@ -107,15 +107,31 @@
                     </tr>
                     <?php $total_amount = $total_amount + ($cart->price * $cart->quantity); ?>
                     @endforeach
-
-
                     <tr>
                         <td colspan="4">&nbsp;</td>
                         <td colspan="2">
                             <table class="table table-condensed total-result">
                                 <tr>
+                                    <td>Cart Sub Total</td>
+                                    <td>$ {{ $total_amount }}</td>
+                                </tr>
+                                <tr class="shipping-cost">
+                                    <td>Shipping Cost (+)</td>
+                                    <td>$ 0</td>
+                                </tr>
+                                <tr class="shipping-cost">
+                                    <td>Discount Amount (-)</td>
+                                    <td>
+                                        @if(!empty(Session::get('CouponAmount')))
+                                        $ {{ Session::get('CouponAmount') }}
+                                        @else
+                                        $ 0
+                                        @endif
+                                    </td>
+                                </tr>
+                                <tr>
                                     <td>Total</td>
-                                    <td><span>$ {{ $total_amount }}</span></td>
+                                    <td><span>$ {{ $grand_total = $total_amount - Session::get('CouponAmount') }}</span></td>
                                 </tr>
                             </table>
                         </td>
@@ -124,20 +140,20 @@
             </table>
         </div>
         <form name="paymentForm" id="paymentForm" action="{{ url('/place-order') }}" method="post">{{ csrf_field() }}
-            <input type="hidden" name="total_amount" value="{{ $total_amount }}">
-            <span style="float:right"><button class="btn btn-success" type="submit">Order</button></span>
+            <input type="hidden" name="grand_total" value="{{ $grand_total }}">
+            <div class="payment-options">
+                <span>
+                    <label><strong> Select payment method :</strong></label>
+                </span>
+                <span>
+                    <label><input type="radio" name="payment_method" id="COD" value="COD"> COD</label>
+                </span>
+                <span>
+                    <label><input type="radio" name="payment_method" id="Paypal" value="Paypal"> Paypal</label>
+                </span>
+                <span style="float:right;"><button type="submit" class="btn btn-default" onclick="return selectPaymentMethod();">Place order</button></span>
+            </div>
         </form>
-        <!-- <div class="payment-options">
-            <span>
-                <label><input type="checkbox"> Direct Bank Transfer</label>
-            </span>
-            <span>
-                <label><input type="checkbox"> Check Payment</label>
-            </span>
-            <span>
-                <label><input type="checkbox"> Paypal</label>
-            </span>
-        </div> -->
     </div>
 </section>
 <!--/#cart_items-->

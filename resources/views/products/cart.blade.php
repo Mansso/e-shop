@@ -102,7 +102,7 @@
                         <li>Coupon discount <span>$ <?php echo Session::get('CouponAmount'); ?></span></li>
                         <li>Grand total <span>$ <?php echo $total_amount - Session::get('CouponAmount'); ?></span></li>
                     @else
-                        <li>Grand total <span>$ <?php $total_amount; ?></span></li>
+                        <li>Grand total <span>$ <?php echo $total_amount; ?></span></li>
                     @endif
                 </ul>
                 <a class="btn btn-default update" href="">Update</a>

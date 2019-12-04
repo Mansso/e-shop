@@ -52,7 +52,7 @@ class BannersController extends Controller
         if($request->isMethod('post')){
             $data = $request->all();
 
-            if (!empty($data['status'])) {
+            if (empty($data['status'])) {
                 $status = '0';
             } else {
                 $status = '1';
